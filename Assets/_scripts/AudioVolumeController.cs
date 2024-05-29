@@ -12,11 +12,31 @@ public class AudioVolumeController : MonoBehaviour
     private const int VolumeConvertCoefficient = 20;
 
     [SerializeField] private AudioMixerGroup _masterAudioMixer;
+    [SerializeField] private SliderValueChanger _masterVolumeSlider;
+    [SerializeField] private SliderValueChanger _soundsVolumeSlider;
+    [SerializeField] private SliderValueChanger _musicVolumeSlider;
+    [SerializeField] private ToggleValueChanger _muteToggle;
 
     private float _currentMasterVolume;
     private bool _IsMuted = false;
 
-    public void ToggleMute(bool value)
+    private void OnEnable()
+    {
+        _masterVolumeSlider.ValueChanged += SetMasterVolume;
+        _soundsVolumeSlider.ValueChanged += SetSoundsVolume;
+        _musicVolumeSlider.ValueChanged += SetMusicVolume;
+        _muteToggle.ValueChanged += ToggleMute;
+    }
+
+    private void OnDisable()
+    {
+        _masterVolumeSlider.ValueChanged -= SetMasterVolume;
+        _soundsVolumeSlider.ValueChanged -= SetSoundsVolume;
+        _musicVolumeSlider.ValueChanged -= SetMusicVolume;
+        _muteToggle.ValueChanged -= ToggleMute;
+    }
+
+    private void ToggleMute(bool value)
     {
         _IsMuted = value;
 
@@ -31,7 +51,7 @@ public class AudioVolumeController : MonoBehaviour
         }
     }
 
-    public void SetMasterVolume(float volume)
+    private void SetMasterVolume(float volume)
     {
         if (volume < MinVolume)
             throw new ArgumentOutOfRangeException();
@@ -42,7 +62,7 @@ public class AudioVolumeController : MonoBehaviour
             _masterAudioMixer.audioMixer.SetFloat(MasterVolume, _currentMasterVolume);
     }
 
-    public void SetBackgroundMusicVolume(float volume)
+    private void SetMusicVolume(float volume)
     {
         if (volume < MinVolume)
             throw new ArgumentOutOfRangeException();
@@ -50,7 +70,7 @@ public class AudioVolumeController : MonoBehaviour
         ChangeVolume(BackgroundMusicVolume, volume);
     }
 
-    public void SetSoundsVolume(float volume)
+    private void SetSoundsVolume(float volume)
     {
         if (volume < MinVolume)
             throw new ArgumentOutOfRangeException();
